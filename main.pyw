@@ -25,7 +25,7 @@ class Player(pygame.sprite.Sprite):
 			self.rect.y = 0
 
 class Block(pygame.sprite.Sprite):
-	def __init__(self, img="static/brick_wall.png", pos_x=6, pos_y=13):
+	def __init__(self, img="static/brick.png", pos_x=6, pos_y=13, value=None):
 		super().__init__()
 		self.image = pygame.image.load(img).convert()
 		self.image.set_colorkey(ALPHA)
@@ -97,19 +97,26 @@ flag_group = pygame.sprite.Group()
 flag = Block(pos_x=7, pos_y=13, img="static/flag.png")
 flag_group.add(flag)
 
-brickwall_group = pygame.sprite.Group()
+# groups only
+upgrade_group = pygame.sprite.Group()
+block_group = pygame.sprite.Group()
+
 # primitive level construction
-# base wrapper
+# base wrapper (brickawall)
+# x axes
 for item in board[5:8:]:
+	# y axes
 	for index, value in item[11:13:]:
-		brickwall = Block(pos_x=index, pos_y=value, img=tile_set[0])
-		brickwall_group.add(brickwall)
+		block = Block(pos_x=index, pos_y=value, img=basic_tile_set[1])
+		block_group.add(block)
 
 # level creator
+# x axes
 for item in board[3:10:]:
+	# y axes
 	for index, value in item[3:10:]:
-		brickwall = Block(pos_x=index, pos_y=value, img=random.choice(tile_set))
-		brickwall_group.add(brickwall)
+		block = Block(pos_x=index, pos_y=value, img=random.choice(basic_tile_set))
+		block_group.add(block)
 
 bullet_group = pygame.sprite.Group()
 bullet = Bullet(pos_x=player.rect.x, pos_y=player.rect.y)
@@ -124,7 +131,7 @@ enemy_bullet = Bullet(pos_x=enemy.rect.x, pos_y=enemy.rect.y)
 
 # main game loop
 while running:
-	# events
+
 	# key input
 	keys = pygame.key.get_pressed()
 	for event in pygame.event.get():
@@ -175,6 +182,14 @@ while running:
 		player.image = pygame.image.load("static/hero.png").convert()
 		player.image = pygame.transform.rotate(player.image, 270)
 		player.image.set_colorkey(ALPHA)
+
+	# bullet constant direction mechanism
+	if bullet_counter == 0 and direction == 0 and bullet.rect.y >= 0:
+		pass
+
+	# end game condition
+	if player_lives < 0:
+		exit()
 
 	# destroying bullet and reseting bullet conditions 
 	if bullet.rect.y <= 0:
@@ -227,12 +242,6 @@ while running:
 			enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 			enemy_direction = random.randint(0, 3)
 
-			# enemy fiering mechanism
-			if enemy.rect.y <= enemy_fireing:
-				enemy_bullet_group = pygame.sprite.Group()
-				enemy_bullet = Bullet(pos_x=enemy.rect.x + TILE // 2, pos_y=enemy.rect.y + TILE // 2)
-				enemy_bullet_group.add(enemy_bullet)
-
 	elif enemy_direction == 2:
 		enemy.rect.y += ENEMY_SPEED
 
@@ -247,12 +256,6 @@ while running:
 		if enemy.rect.y >= enemy_moving_range:
 			enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 			enemy_direction = random.randint(0, 3)
-
-			# enemy fiering mechanism
-			if enemy.rect.y >= enemy_fireing:
-				enemy_bullet_group = pygame.sprite.Group()
-				enemy_bullet = Bullet(pos_x=enemy.rect.x + TILE // 2, pos_y=enemy.rect.y + TILE // 2)
-				enemy_bullet_group.add(enemy_bullet)
 
 	elif enemy_direction == 1:
 		enemy.rect.x += ENEMY_SPEED
@@ -269,12 +272,6 @@ while running:
 			enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 			enemy_direction = random.randint(0, 3)
 
-			# enemy fiering mechanism
-			if enemy.rect.x >= enemy_fireing:
-				enemy_bullet_group = pygame.sprite.Group()
-				enemy_bullet = Bullet(pos_x=enemy.rect.x + TILE // 2, pos_y=enemy.rect.y + TILE // 2)
-				enemy_bullet_group.add(enemy_bullet)
-
 	elif enemy_direction == 3:
 		enemy.rect.x -= ENEMY_SPEED
 
@@ -290,11 +287,12 @@ while running:
 			enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 			enemy_direction = random.randint(0, 3)
 
-			# enemy fiering mechanism
-			if enemy.rect.x <= enemy_fireing:
-				enemy_bullet_group = pygame.sprite.Group()
-				enemy_bullet = Bullet(pos_x=enemy.rect.x + TILE // 2, pos_y=enemy.rect.y + TILE // 2)
-				enemy_bullet_group.add(enemy_bullet)
+	# spawning upgrade logic 
+	if enemy_id == 15 and upgrade_counter == 0 or enemy_id == 10 and upgrade_counter == 1 or enemy_id == 5 and upgrade_counter == 2:
+		upgrade = Block(pos_x=random.randint(1, 13), pos_y=random.randint(1, 13), img="static/1up.png", value="1up")
+		upgrade_group.add(upgrade)
+
+		upgrade_counter += 1
 
 	# collision section
 	# if players bullet hit enemy
@@ -302,7 +300,7 @@ while running:
 		enemy_id -= 1
 		bullet_counter = 0
 
-		if enemy_id >= 0:
+		if enemy_id >= 1:
 			enemy_group = pygame.sprite.Group()
 			enemy = Enemy(img="static/enemy.png", pos_x=enemy_spawn[random.randint(0, 2)])
 			enemy.image = pygame.transform.rotate(enemy.image, 180)
@@ -315,7 +313,11 @@ while running:
 
 	# if enemy bullet hit player
 	if pygame.sprite.groupcollide(enemy_bullet_group, player_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
-		exit()
+		player_lives -= 1
+
+		player_group = pygame.sprite.Group()
+		player = Player(img="static/hero.png")
+		player_group.add(player)
 
 	# if players bullet hit flag
 	if pygame.sprite.groupcollide(bullet_group, flag_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
@@ -325,12 +327,12 @@ while running:
 	if pygame.sprite.groupcollide(enemy_bullet_group, flag_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
 		exit()
 
-	# if players bullet hit brickwall
-	if pygame.sprite.groupcollide(bullet_group, brickwall_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
+	# if players bullet hit block
+	if pygame.sprite.groupcollide(bullet_group, block_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
 		bullet_counter = 0
 
-	# if enemy bullet hit brickwall
-	if pygame.sprite.groupcollide(enemy_bullet_group, brickwall_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
+	# if enemy bullet hit block
+	if pygame.sprite.groupcollide(enemy_bullet_group, block_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
 		bullet_counter = 0
 
 	# if player hit enemy
@@ -347,6 +349,10 @@ while running:
 	if pygame.sprite.groupcollide(enemy_bullet_group, bullet_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
 		pass
 
+	# if player collide upgrade
+	if pygame.sprite.groupcollide(player_group, upgrade_group, False, True, pygame.sprite.collide_rect_ratio(1)):
+		player_lives += 1
+
 	# drawing sprites on the screen
 	SCREEN.fill(BLACK)
 
@@ -362,16 +368,20 @@ while running:
 	enemy_group.update()
 	enemy_group.draw(SCREEN)
 
-	brickwall_group.update()
-	brickwall_group.draw(SCREEN)
+	block_group.update()
+	block_group.draw(SCREEN)
 
 	flag_group.update()
 	flag_group.draw(SCREEN)
 
+	upgrade_group.update()
+	upgrade_group.draw(SCREEN)
+
+	# drawing grid
 	# for l1 in range(0, SCREEN_WIDTH, TILE):
-	# 	pygame.draw.line(SCREEN, GREEN, (0, l1), (SCREEN_WIDTH, l1))
+	# 	pygame.draw.line(SCREEN, GREEN, (0, l1), (SCREEN_WIDTH, l1), LINE_THICKNESS)
 	# 	for l2 in range(0, SCREEN_WIDTH, TILE):
-	# 		pygame.draw.line(SCREEN, GREEN, (l2, 0), (l2, SCREEN_HEIGHT))
+	# 		pygame.draw.line(SCREEN, GREEN, (l2, 0), (l2, SCREEN_HEIGHT), LINE_THICKNESS)
 
 	# fps counter
 	pygame.display.flip()

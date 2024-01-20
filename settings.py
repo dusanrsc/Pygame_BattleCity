@@ -4,8 +4,10 @@ import random
 
 # game settings
 # game constants
-SCREEN_WIDTH = 650
-SCREEN_HEIGHT = 650
+LINE_THICKNESS = 1
+
+SCREEN_WIDTH = 650 + LINE_THICKNESS
+SCREEN_HEIGHT = 650 + LINE_THICKNESS
 SCREEN_TITLE = "BattleCity"
 
 FPS = 60
@@ -25,12 +27,17 @@ BLUE = (0, 0, 255)
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
 
+DARK_PURPLE = (50, 0, 50)
+LIGHT_PURPLE = (100, 0, 100)
+
 ALPHA = GREEN
 
 # game variables
 # settings
 __version__ = "v1.0"
 running = True
+
+player_lives = 3
 
 direction = 0
 bullet_counter = 0
@@ -44,11 +51,39 @@ enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 enemy_fireing = random.randint(0, SCREEN_WIDTH)
 
 enemy_bullet_counter = 0
+upgrade_counter = 0
 
 # game lists
 # cpu spawn points
 enemy_spawn = [0, 350, 650]
-tile_set = ["static/brick.png", "static/steel.png", "static/forrest.png", "static/water.png", "static/ice.png"]
+
+color_list = [RED, GREEN, BLUE, BLACK, WHITE, DARK_PURPLE, LIGHT_PURPLE, ALPHA]
+
+basic_tile_set = ["static/steel.png",
+				  "static/brick.png",
+				  "static/forrest.png",
+				  "static/water.png",
+				  "static/ice.png"]
+
+full_tile_set = ["static/steel.png",
+			"static/brick.png",
+			"static/water.png",
+			"static/snow.png",
+			"static/ice.png",
+			"static/forrest.png",
+			"static/grass.png",
+			"static/dirt.png",
+			"static/sand.png",
+			"static/rock.png"]
+
+enemy_list = ["static/enemy.png",
+			  "static/enemy2.png"]
+
+player_list = ["static/hero.png",
+			   "static/hero2.png"]
+
+upgrade_list = ["static/1up.png"]
+
 board = [
 [[1,  1], [1,  2], [1,  3], [1,  4], [1,  5], [1,  6], [1,  7], [1,  8], [1,  9], [1,  10], [1,  11], [1,  12], [1,  13]],
 [[2,  1], [2,  2], [2,  3], [2,  4], [2,  5], [2,  6], [2,  7], [2,  8], [2,  9], [2,  10], [2,  11], [2,  12], [2,  13]],
