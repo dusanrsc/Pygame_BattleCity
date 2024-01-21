@@ -6,8 +6,8 @@ import random
 # game constants
 LINE_THICKNESS = 1
 
-SCREEN_WIDTH = 650 + LINE_THICKNESS
-SCREEN_HEIGHT = 650 + LINE_THICKNESS
+SCREEN_WIDTH = 650
+SCREEN_HEIGHT = 650
 SCREEN_TITLE = "BattleCity"
 
 FPS = 60
@@ -17,7 +17,7 @@ PLAYER_SPEED = 4
 PLAYER_SIZE = TILE
 BULLET_SPEED = PLAYER_SPEED * 2
 
-ENEMY_SPEED = PLAYER_SPEED
+ENEMY_SPEED = PLAYER_SPEED - 1
 
 # rgb color tuples
 RED = (255, 0, 0)
@@ -26,9 +26,6 @@ BLUE = (0, 0, 255)
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
-
-DARK_PURPLE = (50, 0, 50)
-LIGHT_PURPLE = (100, 0, 100)
 
 ALPHA = GREEN
 
@@ -40,49 +37,52 @@ running = True
 player_lives = 3
 
 direction = 0
+bullet_direction = 0
 bullet_counter = 0
 
 # enemy settings
 enemy_id = 20
-max_enemy = 4
+max_enemy = 3
+current_enemy = 1
 
 enemy_direction = random.randint(0, 3)
 enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 enemy_fireing = random.randint(0, SCREEN_WIDTH)
-
+enemy_bullet_direction = 0
 enemy_bullet_counter = 0
+
 upgrade_counter = 0
+enemy_spawn_switch = 0
 
 # game lists
 # cpu spawn points
 enemy_spawn = [0, 350, 650]
 
-color_list = [RED, GREEN, BLUE, BLACK, WHITE, DARK_PURPLE, LIGHT_PURPLE, ALPHA]
+# colors
+color_list = [RED, GREEN, BLUE, BLACK, WHITE, ALPHA]
 
-basic_tile_set = ["static/steel.png",
-				  "static/brick.png",
-				  "static/forrest.png",
-				  "static/water.png",
-				  "static/ice.png"]
+# tiles
+basic_tile_set = [
+"static/steel.png",
+"static/brick.png",
+"static/forrest.png",
+"static/water.png",
+"static/ice.png"]
 
-full_tile_set = ["static/steel.png",
-			"static/brick.png",
-			"static/water.png",
-			"static/snow.png",
-			"static/ice.png",
-			"static/forrest.png",
-			"static/grass.png",
-			"static/dirt.png",
-			"static/sand.png",
-			"static/rock.png"]
+# enemy sprites
+enemy_list = [
+"static/enemy.png",
+"static/enemy2.png"]
 
-enemy_list = ["static/enemy.png",
-			  "static/enemy2.png"]
+# player sprites
+player_list = [
+"static/hero.png",
+"static/hero2.png"]
 
-player_list = ["static/hero.png",
-			   "static/hero2.png"]
-
-upgrade_list = ["static/1up.png"]
+# upgrade sprites
+upgrade_list = [
+"static/1up2.png",
+"static/speed.png"]
 
 board = [
 [[1,  1], [1,  2], [1,  3], [1,  4], [1,  5], [1,  6], [1,  7], [1,  8], [1,  9], [1,  10], [1,  11], [1,  12], [1,  13]],
