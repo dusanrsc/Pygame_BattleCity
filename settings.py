@@ -6,18 +6,18 @@ import random
 # game constants
 LINE_THICKNESS = 1
 
-SCREEN_WIDTH = 650
+SCREEN_WIDTH  = 650
 SCREEN_HEIGHT = 650
+
 SCREEN_TITLE = "BattleCity"
 
 FPS = 60
 TILE = 50
 
-PLAYER_SPEED = 4
 PLAYER_SIZE = TILE
-BULLET_SPEED = PLAYER_SPEED * 2
-
-ENEMY_SPEED = PLAYER_SPEED - 1
+PLAYER_SPEED = 4
+BULLET_SPEED = PLAYER_SPEED + (PLAYER_SPEED // 2)
+ENEMY_SPEED = 4
 
 # rgb color tuples
 RED = (255, 0, 0)
@@ -50,7 +50,7 @@ enemy_moving_range = random.randint(0, SCREEN_WIDTH)
 enemy_fireing = random.randint(0, SCREEN_WIDTH)
 enemy_bullet_direction = 0
 enemy_bullet_counter = 0
-
+enemy_health = 3
 upgrade_counter = 0
 enemy_spawn_switch = 0
 
@@ -81,7 +81,8 @@ player_list = [
 
 # upgrade sprites
 upgrade_list = [
-"static/1up2.png",
+"static/1up.png",
+"static/bulletsp.png",
 "static/speed.png"]
 
 board = [

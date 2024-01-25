@@ -7,7 +7,7 @@ from settings import *
 # game classes
 # class player
 class Player(pygame.sprite.Sprite):
-	def __init__(self, img="static/herow.png", pos_x=5, pos_y=13):
+	def __init__(self, img="static/hero.png", pos_x=5, pos_y=13):
 		super().__init__()
 		self.image = pygame.image.load(img).convert()
 		self.image.set_colorkey(ALPHA)
@@ -19,24 +19,11 @@ class Player(pygame.sprite.Sprite):
 		if self.rect.x >= SCREEN_WIDTH - PLAYER_SIZE:
 			self.rect.x = SCREEN_WIDTH - PLAYER_SIZE
 		if self.rect.y >= SCREEN_HEIGHT - PLAYER_SIZE:
-			self.rect.y = SCREEN_WIDTH - PLAYER_SIZE
+			self.rect.y = SCREEN_HEIGHT - PLAYER_SIZE
 		if self.rect.x <= 0:
 			self.rect.x = 0
 		if self.rect.y <= 0:
 			self.rect.y = 0
-
-# class block
-class Block(pygame.sprite.Sprite):
-	def __init__(self, img="static/brick.png", pos_x=6, pos_y=13, value=None):
-		super().__init__()
-		self.image = pygame.image.load(img).convert()
-		self.image.set_colorkey(ALPHA)
-		self.rect = self.image.get_rect(center = [pos_x * 50 - 25, pos_y * 50 - 25])
-
-	# update method
-	def update(self):
-		# blank
-		pass
 
 # class bullet
 class Bullet(pygame.sprite.Sprite):
@@ -72,11 +59,24 @@ class Enemy(pygame.sprite.Sprite):
 		if self.rect.x >= SCREEN_WIDTH - PLAYER_SIZE:
 			self.rect.x = SCREEN_WIDTH - PLAYER_SIZE
 		if self.rect.y >= SCREEN_HEIGHT - PLAYER_SIZE:
-			self.rect.y = SCREEN_WIDTH - PLAYER_SIZE
+			self.rect.y = SCREEN_HEIGHT - PLAYER_SIZE
 		if self.rect.x <= 0:
 			self.rect.x = 0
 		if self.rect.y <= 0:
 			self.rect.y = 0
+
+# class block
+class Block(pygame.sprite.Sprite):
+	def __init__(self, img="static/brick.png", pos_x=6, pos_y=13):
+		super().__init__()
+		self.img = img
+		self.image = pygame.image.load(img).convert()
+		self.image.set_colorkey(ALPHA)
+		self.rect = self.image.get_rect(center = [pos_x * 50 - 25, pos_y * 50 - 25])
+
+	# update method
+	def update(self):
+		pass
 
 # game functions
 # exit game function
@@ -113,9 +113,7 @@ flag_group.add(flag)
 upgrade_group = pygame.sprite.Group()
 block_group = pygame.sprite.Group()
 
-# primitive level construction
 # nested for loops
-
 # base wrapper (brickawall)
 # x axes
 for item in board[5:8:]:
@@ -126,9 +124,9 @@ for item in board[5:8:]:
 
 # level creator
 # x axes
-for item in board[3:10:]:
+for item in board[3:-3:]:
 	# y axes
-	for index, value in item[3:10:]:
+	for index, value in item[3:-3:]:
 		block = Block(pos_x=index, pos_y=value, img=random.choice(basic_tile_set))
 		block_group.add(block)
 
@@ -148,7 +146,6 @@ enemy_bullet = Bullet(pos_x=enemy.rect.x, pos_y=enemy.rect.y)
 
 # main game loop
 while running:
-
 	# checking for key input
 	keys = pygame.key.get_pressed()
 	for event in pygame.event.get():
@@ -355,36 +352,69 @@ while running:
 	# player collision section
 	# if player hit enemy
 	if pygame.sprite.groupcollide(player_group, enemy_group, False, False, pygame.sprite.collide_rect_ratio(.85)):
-		enemy_direction = random.randint(0, 3)
-		enemy_moving_range = random.randint(0, SCREEN_WIDTH)
-
-	# if player hit block
-	if pygame.sprite.groupcollide(player_group, block_group, False, False, pygame.sprite.collide_rect_ratio(1)):
 		pass
 
-	# if player collide upgrade
+	# if player hit block
+	if pygame.sprite.groupcollide(player_group, block_group, False, False, pygame.sprite.collide_rect_ratio(.85)):
+		for item in block_group:
+			if item.img == "static/forrest.png":
+				player_group.update()
+				player_group.draw(SCREEN)
+				pass
+
+	# if player hit upgrade
 	if pygame.sprite.groupcollide(player_group, upgrade_group, False, True, pygame.sprite.collide_rect_ratio(.85)):
-		player_lives += 1
+		# and if upgrade is live add live
+		if upgrade.img == "static/1up.png":
+			player_lives += 1
+
+		# and if upgrade is speed add speed
+		if upgrade.img == "static/speed.png":
+			PLAYER_SPEED += 1
+
+		# and if upgrade is speed add speed
+		if upgrade.img == "static/bulletsp.png":
+			BULLET_SPEED += 1
+
+	# restricting player upgrades
+	# player lives
+	if player_lives >= 10:
+		player_lives = 10
+
+	# player speed
+	if PLAYER_SPEED >= 5:
+		PLAYER_SPEED = 5
+
+	# player bullet speed
+	if BULLET_SPEED >= 12:
+		BULLET_SPEED = 12
 
 	# player bullet collision section
 	# if players bullet hit enemy
-	if pygame.sprite.groupcollide(bullet_group, enemy_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
-		enemy_id -= 1
+	if pygame.sprite.groupcollide(bullet_group, enemy_group, True, False, pygame.sprite.collide_rect_ratio(.85)):
+		enemy_health -= 1
 		bullet_counter = 0
 
-		if enemy_id >= 1:
-			enemy_group = pygame.sprite.Group()
-			enemy_spawn_switch += 1
+		# if enemy health is smaller or equal to zero destroy enemy 
+		if enemy_health <= 0:
+			pygame.sprite.groupcollide(bullet_group, enemy_group, True, True, pygame.sprite.collide_rect_ratio(.85))
+			
+			enemy_id -= 1
+			enemy_health = 3
 
-			# enemy spawn point changing when new enemy got spawned
-			enemy = Enemy(img="static/enemy.png", pos_x=enemy_spawn[enemy_spawn_switch])
-			enemy.image = pygame.transform.rotate(enemy.image, 180)
-			enemy_group.add(enemy)
+			if enemy_id >= 1:
+				enemy_group = pygame.sprite.Group()
+				enemy_spawn_switch += 1
 
-			enemy_direction = random.randint(0, 3)
-			enemy_moving_range = random.randint(0, SCREEN_WIDTH)
-		else:
-			enemy.kill()
+				# enemy spawn point changing when new enemy got spawned
+				enemy = Enemy(img="static/enemy.png", pos_x=enemy_spawn[enemy_spawn_switch])
+				enemy.image = pygame.transform.rotate(enemy.image, 180)
+				enemy_group.add(enemy)
+
+				enemy_direction = random.randint(0, 3)
+				enemy_moving_range = random.randint(0, SCREEN_WIDTH)
+			else:
+				enemy.kill()
 
 	# if players bullet hit flag
 	if pygame.sprite.groupcollide(bullet_group, flag_group, True, True, pygame.sprite.collide_rect_ratio(.85)):
@@ -405,8 +435,7 @@ while running:
 	# enemy collision section
 	# if enemy hit flag
 	if pygame.sprite.groupcollide(enemy_group, flag_group, False, False, pygame.sprite.collide_rect_ratio(1)):
-		enemy_direction = random.randint(0, 3)
-		enemy_moving_range = random.randint(0, SCREEN_WIDTH)
+		pass
 
 	# if enemy hit block
 	if pygame.sprite.groupcollide(enemy_group, block_group, False, False, pygame.sprite.collide_rect_ratio(.85)):
@@ -433,14 +462,8 @@ while running:
 	bullet_group.update()
 	bullet_group.draw(SCREEN)
 
-	player_group.update()
-	player_group.draw(SCREEN)
-
 	enemy_bullet_group.update()
 	enemy_bullet_group.draw(SCREEN)
-
-	enemy_group.update()
-	enemy_group.draw(SCREEN)
 
 	block_group.update()
 	block_group.draw(SCREEN)
@@ -451,10 +474,16 @@ while running:
 	upgrade_group.update()
 	upgrade_group.draw(SCREEN)
 
+	enemy_group.update()
+	enemy_group.draw(SCREEN)
+
+	player_group.update()
+	player_group.draw(SCREEN)
+
 	# drawing grid
 	# for l1 in range(0, SCREEN_WIDTH, TILE):
 	# 	pygame.draw.line(SCREEN, GREEN, (0, l1), (SCREEN_WIDTH, l1), LINE_THICKNESS)
-	# 	for l2 in range(0, SCREEN_WIDTH, TILE):
+	# 	for l2 in range(0, SCREEN_HEIGHT, TILE):
 	# 		pygame.draw.line(SCREEN, GREEN, (l2, 0), (l2, SCREEN_HEIGHT), LINE_THICKNESS)
 
 	# updating the screen
