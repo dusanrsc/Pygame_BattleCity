@@ -105,30 +105,58 @@ player = Player(img="static/hero.png")
 player_group.add(player)
 
 # flag instance (base) of the class
-flag_group = pygame.sprite.Group()
-flag = Block(pos_x=7, pos_y=13, img="static/flag.png")
-flag_group.add(flag)
 
 # creating groups only
+flag_group = pygame.sprite.Group()
 upgrade_group = pygame.sprite.Group()
 block_group = pygame.sprite.Group()
 
-# nested for loops
-# base wrapper (brickawall)
-# x axes
-for item in board[5:8:]:
-	# y axes
-	for index, value in item[11:13:]:
-		block = Block(pos_x=index, pos_y=value, img=basic_tile_set[1])
-		block_group.add(block)
+# # nested for loops
+# # base wrapper (brickawall)
+# # x axes
+# for item in board[5:8:]:
+# 	# y axes
+# 	for index, value in item[11:13:]:
+# 		block = Block(pos_x=index, pos_y=value, img=basic_tile_set[1])
+# 		block_group.add(block)
 
-# level creator
-# x axes
-for item in board[3:-3:]:
-	# y axes
-	for index, value in item[3:-3:]:
-		block = Block(pos_x=index, pos_y=value, img=random.choice(basic_tile_set))
-		block_group.add(block)
+# # level creator primitive
+# # x axes
+# for item in board[3:-3:]:
+# 	# y axes
+# 	for index, value in item[3:-3:]:
+# 		block = Block(pos_x=index, pos_y=value, img=random.choice(basic_tile_set))
+# 		block_group.add(block)
+
+# level creation from world list
+for row_index, row in enumerate(world, start=1):
+	for col_index, tile in enumerate(row, start=1):
+		if tile == 1:
+			block = Block(pos_x=(col_index), pos_y=(row_index), img=basic_tile_set[0])
+			block_group.add(block)
+
+		elif tile == 2:
+			block = Block(pos_x=(col_index), pos_y=(row_index), img=basic_tile_set[1])
+			block_group.add(block)
+
+		elif tile == 3:
+			block = Block(pos_x=(col_index), pos_y=(row_index), img=basic_tile_set[2])
+			block_group.add(block)
+
+		elif tile == 4:
+			block = Block(pos_x=(col_index), pos_y=(row_index), img=basic_tile_set[3])
+			block_group.add(block)
+
+		elif tile == 5:
+			block = Block(pos_x=(col_index), pos_y=(row_index), img=basic_tile_set[4])
+			block_group.add(block)
+
+		elif tile == 9:
+			flag = Block(pos_x=(col_index), pos_y=(row_index), img="static/flag.png")
+			flag_group.add(flag)
+			
+		else:
+			pass
 
 # bullet instance of the class
 bullet_group = pygame.sprite.Group()
@@ -465,6 +493,12 @@ while running:
 	enemy_bullet_group.update()
 	enemy_bullet_group.draw(SCREEN)
 
+	enemy_group.update()
+	enemy_group.draw(SCREEN)
+
+	player_group.update()
+	player_group.draw(SCREEN)
+
 	block_group.update()
 	block_group.draw(SCREEN)
 
@@ -473,12 +507,6 @@ while running:
 
 	upgrade_group.update()
 	upgrade_group.draw(SCREEN)
-
-	enemy_group.update()
-	enemy_group.draw(SCREEN)
-
-	player_group.update()
-	player_group.draw(SCREEN)
 
 	# drawing grid
 	# for l1 in range(0, SCREEN_WIDTH, TILE):
