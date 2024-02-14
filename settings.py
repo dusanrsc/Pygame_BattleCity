@@ -33,6 +33,7 @@ ALPHA = GREEN
 # settings
 __version__ = "v2.0"
 running = True
+frame = 0
 
 player_lives = 3
 
@@ -85,20 +86,48 @@ upgrade_list = [
 "static/bulletsp.png",
 "static/speed.png"]
 
-world = [
-[0,0,0,2,0,0,0,2,0,0,0,0,0],
-[0,1,0,2,0,0,0,1,0,1,0,1,0],
-[0,1,0,0,0,0,1,1,0,1,2,1,0],
-[0,0,0,1,0,0,0,0,0,2,0,0,0],
-[3,0,0,1,0,0,2,0,0,1,3,1,2],
-[3,3,0,0,0,1,0,0,2,0,3,0,0],
-[0,1,1,1,3,3,3,2,0,0,3,1,0],
-[0,0,0,2,3,1,0,1,0,1,0,1,0],
-[2,1,4,2,0,1,0,1,0,0,0,1,0],
-[0,1,0,1,0,1,1,1,0,1,2,1,0],
-[0,1,0,1,0,0,0,0,0,0,0,0,0],
-[0,1,0,0,0,1,1,1,0,1,0,1,0],
-[0,1,0,1,0,1,9,1,0,1,1,1,0]]
+# explosion prefabs
+# loading images
+exp0 = pygame.image.load("static/explosion/explosion0.png")
+exp1 = pygame.image.load("static/explosion/explosion1.png")
+exp2 = pygame.image.load("static/explosion/explosion2.png")
+exp3 = pygame.image.load("static/explosion/explosion3.png")
+exp4 = pygame.image.load("static/explosion/explosion4.png")
+exp5 = pygame.image.load("static/explosion/explosion5.png")
+exp6 = pygame.image.load("static/explosion/explosion6.png")
+exp7 = pygame.image.load("static/explosion/explosion7.png")
+
+# scaling images to requiered size
+exp0 = pygame.transform.scale(exp0, (TILE, TILE))
+exp1 = pygame.transform.scale(exp1, (TILE, TILE))
+exp2 = pygame.transform.scale(exp2, (TILE, TILE))
+exp3 = pygame.transform.scale(exp3, (TILE, TILE))
+exp4 = pygame.transform.scale(exp4, (TILE, TILE))
+exp5 = pygame.transform.scale(exp5, (TILE, TILE))
+exp6 = pygame.transform.scale(exp6, (TILE, TILE))
+exp7 = pygame.transform.scale(exp7, (TILE, TILE))
+
+# setting up colorkey
+exp0.set_colorkey(ALPHA)
+exp1.set_colorkey(ALPHA)
+exp2.set_colorkey(ALPHA)
+exp3.set_colorkey(ALPHA)
+exp4.set_colorkey(ALPHA)
+exp5.set_colorkey(ALPHA)
+exp6.set_colorkey(ALPHA)
+exp7.set_colorkey(ALPHA)
+
+# creating explosion list
+# adding explosion seqences to list
+explosion = []
+explosion.append(exp0)
+explosion.append(exp1)
+explosion.append(exp2)
+explosion.append(exp3)
+explosion.append(exp4)
+explosion.append(exp5)
+explosion.append(exp6)
+explosion.append(exp7)
 
 """ 	  blank world
 [0,0,0,0,0,0,0,0,0,0,0,0,0],
@@ -115,6 +144,21 @@ world = [
 [0,0,0,0,0,1,1,1,0,0,0,0,0],
 [0,0,0,0,0,1,9,1,0,0,0,0,0]]
 """
+
+world = [
+[0,0,0,2,0,0,0,2,0,0,0,0,0],
+[0,1,0,2,0,0,0,1,0,1,0,1,0],
+[0,1,0,0,0,0,1,1,0,1,2,1,0],
+[0,0,0,1,0,0,0,0,0,2,0,0,0],
+[3,0,0,1,0,0,2,0,0,1,3,1,2],
+[3,3,0,0,0,1,0,0,2,0,3,0,0],
+[0,1,1,1,3,3,3,2,0,0,3,1,0],
+[0,0,0,2,3,1,0,1,0,1,0,1,0],
+[2,1,4,2,0,1,0,1,0,0,0,1,0],
+[0,1,0,1,0,1,1,1,0,1,2,1,0],
+[0,1,0,1,0,0,0,0,0,0,0,0,0],
+[0,1,0,0,0,1,1,1,0,1,0,1,0],
+[0,1,0,1,0,1,9,1,0,1,1,1,0]]
 
 board = [
 [[1,  1], [1,  2], [1,  3], [1,  4], [1,  5], [1,  6], [1,  7], [1,  8], [1,  9], [1,  10], [1,  11], [1,  12], [1,  13]],

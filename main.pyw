@@ -104,24 +104,13 @@ player_group = pygame.sprite.Group()
 player = Player(img="static/hero.png")
 player_group.add(player)
 
-# flag instance (base) of the class
-
 # creating groups only
 flag_group = pygame.sprite.Group()
 upgrade_group = pygame.sprite.Group()
 block_group = pygame.sprite.Group()
 
-# # nested for loops
-# # base wrapper (brickawall)
-# # x axes
-# for item in board[5:8:]:
-# 	# y axes
-# 	for index, value in item[11:13:]:
-# 		block = Block(pos_x=index, pos_y=value, img=basic_tile_set[1])
-# 		block_group.add(block)
-
-# # level creator primitive
-# # x axes
+# level creator primitive
+# x axes
 # for item in board[3:-3:]:
 # 	# y axes
 # 	for index, value in item[3:-3:]:
@@ -154,7 +143,6 @@ for row_index, row in enumerate(world, start=1):
 		elif tile == 9:
 			flag = Block(pos_x=(col_index), pos_y=(row_index), img="static/flag.png")
 			flag_group.add(flag)
-			
 		else:
 			pass
 
@@ -174,6 +162,12 @@ enemy_bullet = Bullet(pos_x=enemy.rect.x, pos_y=enemy.rect.y)
 
 # main game loop
 while running:
+
+	# engine of the explosion animation
+	frame += 1
+	if frame >= len(explosion):
+		frame = 0
+
 	# checking for key input
 	keys = pygame.key.get_pressed()
 	for event in pygame.event.get():
@@ -385,10 +379,7 @@ while running:
 	# if player hit block
 	if pygame.sprite.groupcollide(player_group, block_group, False, False, pygame.sprite.collide_rect_ratio(.85)):
 		for item in block_group:
-			if item.img == "static/forrest.png":
-				player_group.update()
-				player_group.draw(SCREEN)
-				pass
+			pass
 
 	# if player hit upgrade
 	if pygame.sprite.groupcollide(player_group, upgrade_group, False, True, pygame.sprite.collide_rect_ratio(.85)):
@@ -485,6 +476,9 @@ while running:
 	# drawing sprites on the screen
 	# filling complete screen with color
 	SCREEN.fill(BLACK)
+
+	# drawing explosion animation on the screen
+	# SCREEN.blit(explosion[frame], (0, 0))
 
 	# drawing groups on the screen
 	bullet_group.update()
